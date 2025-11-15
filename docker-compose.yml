@@ -1,0 +1,33 @@
+﻿version: "3.9"
+services:
+  node-a:
+    build: .
+    container_name: acme-node-a
+    environment:
+      NODE_NAME: node-a
+      PEERS: http://node-b:8001
+      REPLICATION_TOKEN: replica-secret
+      JWT_SECRET: acme-jwt-secret
+      ADMIN_PASSWORD: senhaFort3!
+      DATABASE_DIR: /data
+    ports:
+      - "8000:8000"
+    volumes:
+      - data-a:/data
+  node-b:
+    build: .
+    container_name: acme-node-b
+    environment:
+      NODE_NAME: node-b
+      PEERS: http://node-a:8000
+      REPLICATION_TOKEN: replica-secret
+      JWT_SECRET: acme-jwt-secret
+      ADMIN_PASSWORD: senhaFort3!
+      DATABASE_DIR: /data
+    ports:
+      - "8001:8000"
+    volumes:
+      - data-b:/data
+volumes:
+  data-a:
+  data-b:
