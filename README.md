@@ -1,10 +1,41 @@
-﻿
+﻿# ACME/SA - API Distribuída de Pedidos e Estoque
+
+API acadêmico-profissional que simula múltiplas filiais replicando pedidos e estoque. Cada nó roda FastAPI + SQLite (WAL), sincroniza eventos via HTTP e aplica autenticação JWT com usuários persistidos.
+
+## Visão rápida
+- **Domínio completo**: clientes, produtos, usuários, pedidos (itens) e estoque versionado.
+- **Autenticação**: login (`/auth/login`) com bcrypt + JWT (`JWT_SECRET`), perfis admin/operador/auditor; admin seedado no startup.
+- **Consistência e replicação**: locks por produto + transação única para pedido/estoque; eventos idempotentes (`client_upsert`, `product_upsert`, `user_upsert`, `order_created`, `stock_update`) entre pares configurados em `PEERS`.
+- **Tolerância a falhas**: fila best-effort com retentativa (`REPLICATION_RETRY_SECONDS`); backlog visível em `/status`.
+- **Segurança interna**: tráfego entre réplicas protegido por `X-Replica-Token` separado dos tokens de usuário.
+
+## Requisitos
+- Python 3.11+
+- Pip
+
+## Variáveis de ambiente principais
+| Nome | Descrição | Padrão |
+| --- | --- | --- |
+| `NODE_NAME` | Identificação do nó | `node-a` |
+| `PEERS` | URLs dos pares (`,` separado) | vazio |
+| `JWT_SECRET` | Segredo dos tokens JWT | `acme-jwt-secret` |
+| `ADMIN_USER` / `ADMIN_PASSWORD` | Usuário admin inicial | `admin` / `admin123` |
+| `REPLICATION_TOKEN` | Segredo para `/replica/event` | `replica-secret` |
+| `DATABASE_DIR` | Pasta dos arquivos `.db` | `data` |
+| `REPLICATION_RETRY_SECONDS` | Intervalo de retentativa | `10` |
+
+## Rodando local (venv)
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+Configure as variáveis no terminal antes do `uvicorn` conforme necessário.
 
 ## Execução com Docker
-
 ### Build local único
 ```powershell
-# Windows/Linux/macOS
 docker build -t acme-api .
 ```
 
@@ -22,22 +53,62 @@ docker build -t acme-api .
   ```
 - Windows (PowerShell):
   ```powershell
-  docker run --rm -p 8000:8000 \
-    -e NODE_NAME=node-a \
-    -e PEERS= \
-    -e JWT_SECRET=acme-jwt-secret \
-    -e REPLICATION_TOKEN=replica-secret \
-    -e DATABASE_DIR=/data \
-    -v "$(Resolve-Path .\data):/data" \
+  docker run --rm -p 8000:8000 ^
+    -e NODE_NAME=node-a ^
+    -e PEERS= ^
+    -e JWT_SECRET=acme-jwt-secret ^
+    -e REPLICATION_TOKEN=replica-secret ^
+    -e DATABASE_DIR=/data ^
+    -v "$(Resolve-Path .\data):/data" ^
     acme-api
   ```
 
-### Subir duas réplicas com Docker Compose
+### Duas réplicas com Docker Compose
 ```powershell
 docker-compose up -d
 ```
 - node-a exposto em 8000, node-b em 8001 (ambos ouvindo 8000 internamente).
-- Volumes data-a e data-b armazenam os bancos.
+- Volumes `data-a` e `data-b` armazenam os bancos.
 
-> Ajuste ADMIN_PASSWORD, JWT_SECRET e REPLICATION_TOKEN quando for para produção.
+> Ajuste `ADMIN_PASSWORD`, `JWT_SECRET` e `REPLICATION_TOKEN` antes de produção.
 
+## Endpoints principais
+Todos os `POST`/`PUT` aceitam `application/json` e `application/x-www-form-urlencoded` (mesmo schema). Para formulários com listas (itens do pedido), envie `itens` em JSON string.
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `POST` | `/auth/login` | JWT (JSON ou x-form). |
+| `POST` | `/usuarios` | Cria usuário (admin). |
+| `GET` | `/usuarios/me` | Dados do usuário autenticado. |
+| `POST` | `/clientes` | Cria/atualiza cliente (ID gerado se omitido). |
+| `GET` | `/clientes` / `/{id}` | Lista/consulta clientes. |
+| `POST` | `/produtos` | Cria/atualiza produto (ID gerado se omitido). |
+| `GET` | `/produtos` / `/{id}` | Lista/consulta produtos. |
+| `POST` | `/pedido` | Cria pedido para cliente existente com itens `{produto_id, quantidade}`. |
+| `GET` | `/pedido/{id}` | Consulta pedido. |
+| `PUT` | `/estoque/{produto}` | Ajusta saldo (entrada/saída) com replicação. |
+| `GET` | `/estoque/{produto}` | Saldo + versão. |
+| `GET` | `/status` | Contagens, estoque, fila por peer. |
+| `POST` | `/replica/event` | Uso interno entre nós (`X-Replica-Token`). |
+
+### Exemplo de pedido
+- JSON:
+```json
+{
+  "cliente_id": "cli-001",
+  "itens": [
+    {"produto_id": "sku-123", "quantidade": 2},
+    {"produto_id": "sku-456", "quantidade": 1}
+  ]
+}
+```
+- Formulário: `cliente_id=cli-001`, `itens=[{"produto_id":"sku-123","quantidade":2}]`
+
+## Cenários de teste
+1. **Concorrência**: saldo 1, dois pedidos simultâneos → apenas um confirma, outro 409.
+2. **Consistência eventual**: pedido no nó A, consulte `/estoque` no nó B antes/depois da replicação.
+3. **Falha simulada**: derrube nó B, opere no A, religue e observe `pending` sumir em `/status`.
+4. **Segurança**: sem token → 401; token inválido → 401/403; JWT válido → 200.
+
+## Relatório técnico
+`docs/Relatorio.pdf` (gere novamente com `python scripts\make_pdf.py` se alterar o texto).
