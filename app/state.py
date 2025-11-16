@@ -449,6 +449,7 @@ class InventoryState:
                     novo_saldo = entry.saldo - item.quantidade
                     versao = entry.versao + 1
                     agora = _utcnow()
+                    referencia_texto = f"pedido:{pedido}"
                     conn.execute(
                         """
                         INSERT INTO stock (product_id, saldo, versao, atualizado_em, origem, referencia)
@@ -460,7 +461,7 @@ class InventoryState:
                             origem=excluded.origem,
                             referencia=excluded.referencia
                         """,
-                        (item.produto_id, novo_saldo, versao, agora, self.node_name, pedido),
+                        (item.produto_id, novo_saldo, versao, agora, self.node_name, referencia_texto),
                     )
                     updated_entries.append(
                         StockEntry(
@@ -469,7 +470,7 @@ class InventoryState:
                             versao=versao,
                             atualizado_em=agora,
                             origem=self.node_name,
-                            referencia=pedido,
+                            referencia=referencia_texto,
                         )
                     )
                 criado_em = _utcnow()

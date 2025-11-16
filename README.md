@@ -80,9 +80,9 @@ Todos os `POST`/`PUT` aceitam `application/json` e `application/x-www-form-urlen
 | `POST` | `/auth/login` | JWT (JSON ou x-form). |
 | `POST` | `/usuarios` | Cria usuário (admin). |
 | `GET` | `/usuarios/me` | Dados do usuário autenticado. |
-| `POST` | `/clientes` | Cria/atualiza cliente (ID gerado se omitido). |
+| `POST` | `/clientes` | Cria/atualiza cliente (ID gerado no servidor). |
 | `GET` | `/clientes` / `/{id}` | Lista/consulta clientes. |
-| `POST` | `/produtos` | Cria/atualiza produto (ID gerado se omitido). |
+| `POST` | `/produtos` | Cria/atualiza produto (ID gerado no servidor). |
 | `GET` | `/produtos` / `/{id}` | Lista/consulta produtos. |
 | `POST` | `/pedido` | Cria pedido para cliente existente com itens `{produto_id, quantidade}`. |
 | `GET` | `/pedido/{id}` | Consulta pedido. |
@@ -90,6 +90,8 @@ Todos os `POST`/`PUT` aceitam `application/json` e `application/x-www-form-urlen
 | `GET` | `/estoque/{produto}` | Saldo + versão. |
 | `GET` | `/status` | Contagens, estoque, fila por peer. |
 | `POST` | `/replica/event` | Uso interno entre nós (`X-Replica-Token`). |
+
+> Os IDs de clientes e produtos são sempre gerados pelo servidor e retornados na resposta de criação; use esses valores nas próximas requisições (ex.: `cliente_id` e `produto_id` do pedido).
 
 ### Exemplo de pedido
 - JSON:

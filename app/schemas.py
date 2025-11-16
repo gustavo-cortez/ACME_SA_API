@@ -1,6 +1,6 @@
 ﻿from __future__ import annotations
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from typing import List, Literal
 
 AllowedRoles = Literal["admin", "operador", "auditor"]
@@ -23,14 +23,12 @@ class UserCreateRequest(BaseModel):
 
 
 class ClientRequest(BaseModel):
-    id: str | None = Field(default=None, min_length=1, description="Opcional, será gerado se omitido")
     nome: str = Field(..., min_length=2)
     documento: str | None = Field(default=None)
     email: EmailStr | None = Field(default=None)
 
 
 class ProductRequest(BaseModel):
-    id: str | None = Field(default=None, min_length=1, description="Opcional, será gerado se omitido")
     nome: str = Field(..., min_length=2)
     descricao: str | None = Field(default=None)
     ativo: bool = True
@@ -42,6 +40,18 @@ class PedidoItemRequest(BaseModel):
 
 
 class PedidoRequest(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "cliente_id": "cli-123",
+                "itens": [
+                    {"produto_id": "sku-123", "quantidade": 2},
+                    {"produto_id": "sku-456", "quantidade": 1},
+                ],
+                "pedido_id": None,
+            }
+        }
+    )
     cliente_id: str = Field(..., min_length=1)
     itens: List[PedidoItemRequest] = Field(..., min_length=1)
     pedido_id: str | None = Field(default=None, description="Opcional para testes controlados")

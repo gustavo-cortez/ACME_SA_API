@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import asyncio
 import json
 import uuid
 from typing import Any, Dict, List, Literal, Type
@@ -187,7 +188,7 @@ async def usuario_atual(user: UserRecord = Depends(get_current_user)):
 )
 async def criar_cliente(request: Request):
     payload: ClientRequest = await parse_payload(request, ClientRequest)
-    client_id = payload.id or str(uuid.uuid4())
+    client_id = str(uuid.uuid4())
     client = state.upsert_client(
         client_id=client_id,
         nome=payload.nome,
@@ -218,7 +219,7 @@ async def obter_cliente(cliente_id: str, user: UserRecord = Depends(get_current_
 )
 async def criar_produto(request: Request):
     payload: ProductRequest = await parse_payload(request, ProductRequest)
-    product_id = payload.id or str(uuid.uuid4())
+    product_id = str(uuid.uuid4())
     product = state.upsert_product(
         product_id=product_id,
         nome=payload.nome,

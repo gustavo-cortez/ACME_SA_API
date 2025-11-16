@@ -5,7 +5,7 @@ services:
     container_name: acme-node-a
     environment:
       NODE_NAME: node-a
-      PEERS: http://node-b:8001
+      PEERS: http://node-b:8000
       REPLICATION_TOKEN: replica-secret
       JWT_SECRET: acme-jwt-secret
       ADMIN_PASSWORD: senhaFort3!
