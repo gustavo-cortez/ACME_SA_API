@@ -105,12 +105,3 @@ Todos os `POST`/`PUT` aceitam `application/json` e `application/x-www-form-urlen
 }
 ```
 - Formulário: `cliente_id=cli-001`, `itens=[{"produto_id":"sku-123","quantidade":2}]`
-
-## Cenários de teste
-1. **Concorrência**: saldo 1, dois pedidos simultâneos → apenas um confirma, outro 409.
-2. **Consistência eventual**: pedido no nó A, consulte `/estoque` no nó B antes/depois da replicação.
-3. **Falha simulada**: derrube nó B, opere no A, religue e observe `pending` sumir em `/status`.
-4. **Segurança**: sem token → 401; token inválido → 401/403; JWT válido → 200.
-
-## Relatório técnico
-`docs/Relatorio.pdf` (gere novamente com `python scripts\make_pdf.py` se alterar o texto).
