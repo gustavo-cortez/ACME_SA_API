@@ -1,6 +1,6 @@
 ﻿# ACME/SA - API Distribuída de Pedidos e Estoque
 
-API acadêmico-profissional que simula múltiplas filiais replicando pedidos e estoque. Cada nó roda FastAPI + SQLite (WAL), sincroniza eventos via HTTP e aplica autenticação JWT com usuários persistidos.
+API acadêmico-profissional que simula múltiplas filiais replicando pedidos e estoque. Cada nó roda FastAPI + SQLite (WAL), sincroniza eventos via HTTP e aplica autenticação JWT com usuários persistidos. Código disponível no [GitHub](https://github.com/gustavo-cortez/ACME_SA_API).
 
 ## Visão rápida
 - **Domínio completo**: clientes, produtos, usuários, pedidos (itens) e estoque versionado.
@@ -77,7 +77,7 @@ Todos os `POST`/`PUT` aceitam `application/json` e `application/x-www-form-urlen
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| `POST` | `/auth/login` | JWT (JSON ou x-form). |
+| `POST` | `/auth/login` | JWT. |
 | `POST` | `/usuarios` | Cria usuário (admin). |
 | `GET` | `/usuarios/me` | Dados do usuário autenticado. |
 | `POST` | `/clientes` | Cria/atualiza cliente (ID gerado no servidor). |
