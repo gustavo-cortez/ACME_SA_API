@@ -9,6 +9,10 @@ API acadêmico-profissional que simula múltiplas filiais replicando pedidos e e
 - **Tolerância a falhas**: fila best-effort com retentativa (`REPLICATION_RETRY_SECONDS`); backlog visível em `/status`.
 - **Segurança interna**: tráfego entre réplicas protegido por `X-Replica-Token` separado dos tokens de usuário.
 
+## Organização de pastas
+
+
+
 ## Requisitos
 - Python 3.11+
 - Pip

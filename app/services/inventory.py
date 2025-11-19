@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Sequence
 
-from .database import Database
+from ..db.database import Database
 
 
 class StockUnavailableError(Exception):

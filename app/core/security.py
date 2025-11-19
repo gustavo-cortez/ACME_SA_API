@@ -44,3 +44,4 @@ def require_replication_token(x_replica_token: str | None = Header(default=None)
     if x_replica_token != settings.replication_token:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Replica token inválido")
     return x_replica_token
+
