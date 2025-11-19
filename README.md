@@ -12,6 +12,7 @@ API acadêmico-profissional que simula múltiplas filiais replicando pedidos e e
 ## Requisitos
 - Python 3.11+
 - Pip
+- Docker (Opcional)
 
 ## Variáveis de ambiente principais
 | Nome | Descrição | Padrão |
