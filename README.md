@@ -11,7 +11,45 @@ API acadêmico-profissional que simula múltiplas filiais replicando pedidos e e
 
 ## Organização de pastas
 
-
+```
+📦 
+├─ .gitignore
+├─ Dockerfile
+├─ README.md
+├─ app
+│  ├─ __init__.py
+│  ├─ core
+│  │  ├─ __init__.py
+│  │  ├─ config.py
+│  │  ├─ context.py
+│  │  ├─ dependencies.py
+│  │  ├─ http.py
+│  │  ├─ replication.py
+│  │  └─ security.py
+│  ├─ db
+│  │  ├─ __init__.py
+│  │  └─ database.py
+│  ├─ main.py
+│  ├─ routers
+│  │  ├─ __init__.py
+│  │  ├─ auth.py
+│  │  ├─ clientes.py
+│  │  ├─ estoque.py
+│  │  ├─ pedidos.py
+│  │  ├─ produtos.py
+│  │  ├─ replica.py
+│  │  ├─ status.py
+│  │  └─ users.py
+│  ├─ schemas
+│  │  └─ __init__.py
+│  └─ services
+│     ├─ __init__.py
+│     └─ inventory.py
+├─ docker-compose.yml
+├─ docs
+│  └─ Relatorio.pdf
+└─ requirements.txt
+```
 
 ## Requisitos
 - Python 3.11+
